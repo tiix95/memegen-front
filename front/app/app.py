@@ -50,7 +50,8 @@ def edit(template_name):
     if not template_name in templates_list.keys():
         return 404
     template = templates_list[template_name]
-    return render_template('edit.html', template=template, id=template_name, base_url=request.url_root.rstrip('/'))
+    base_url = request.host_url
+    return render_template('edit.html', template=template, id=template_name, base_url=base_url.rstrip('/'))
 
 @app.route('/upload', methods=["POST"])
 def upload():
@@ -63,4 +64,4 @@ def upload():
 if __name__ == '__main__':
     # To get the cache warm
     get_templates_list()
-    app.run()
+    app.run(port=5001)

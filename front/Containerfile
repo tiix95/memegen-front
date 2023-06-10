@@ -1,5 +1,5 @@
 # Base image
-FROM python:3.11-bullseye
+FROM docker.io/python:3.11-bullseye
 
 # Set the working directory in the container
 WORKDIR /app
@@ -29,7 +29,7 @@ RUN chown root:root /usr/local/bin && \
     chmod -R go-w /app/*
 
 # Expose the port on which the Flask app will run
-EXPOSE 5000
+EXPOSE 5001
 
 # Set the environment variable for Flask
 ENV FLASK_APP=app.py
@@ -38,4 +38,4 @@ ENV FLASK_APP=app.py
 USER appuser
 
 # Set the command to run the Flask application
-CMD ["flask", "run", "--host=0.0.0.0"]
+CMD ["flask", "run", "--host=0.0.0.0", "--port=5001"]

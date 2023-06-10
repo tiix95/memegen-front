@@ -1,0 +1,35 @@
+version: '3'
+services:
+  web:
+    image: docker.io/nginx:latest
+    ports:
+      - 8000:80
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    networks:
+      - front_net
+      - back_net
+    depends_on:
+      - front
+      - api
+
+  front:
+    build: ./front/
+    networks:
+      - back_net
+    depends_on:
+      api:
+        condition: service_healthy
+
+  api:
+    build: ./memegen/
+    networks:
+      - back_net
+    healthcheck:
+      test: ["CMD-SHELL", "curl --fail http://api:5000/images || exit 1"]
+      interval: 10s
+      timeout: 10s
+
+networks:
+  front_net:
+  back_net:
