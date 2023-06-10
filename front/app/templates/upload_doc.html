@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <a href="{{ url_for('upload') }}" class="floating-button">&#8592;</a>
+    <h1>Upload The Meme Documentation</h1>
+    <p>
+        The parameters for the template configuration are the following :<br />
+        <ul style="text-align: left">
+            <li><b>name</b>: string, name of the template</li>
+            <li><b>source</b>: string, source of the template (optional)</li>
+            <li><b>text</b>: list, list of text inputs, will be detailed below</li>
+            <li><b>example</b>: list, example use of the template (optional, will not be detailed, see example config.yml)</li>
+            <li><b>overlay</b>: list, optional and not supported on this version anyway</li>
+        </ul><br />
+
+        Let's detail the parameters for each <b>text</b> element:<br />
+        <ul style="text-align: left">
+          <li><b>style</b>: string, accepts <code>default</code> or <code>upper</code></li>
+          <li><b>color</b>: string, font color (black or white basically)</li>
+          <li><b>font</b>: string, accepts <code>thick</code>, <code>thin</code> or <code>comic</code></li>
+          <li><b>anchor_x</b>: float, x coordinate of top-left corner of textbox. 0.0 is leftmost pixel of the image, 1.0 is rightmost pixel of the image</li>
+          <li><b>anchor_y</b>: float, y coordinate of top-left corner of textbox. 0.0 is top pixel of the image, 1.0 is bottom pixel of the image</li>
+          <li><b>angle</b>: float, text rotation. 0.0 is normal, 180.0 is upside down</li>
+          <li><b>scale_x</b>: float, x size of textbox. 0.0 is null, 1.0 is full width of the image</li>
+          <li><b>scale_y</b>: float, y size of textbox. 0.0 is null, 1.0 is full height of the image</li>
+          <li><b>align</b>: string, alignment of text in textbox. Most likely you want <code>center</code></li>
+          <li><b>start</b>: float, if you want text to be animated, defines when text appears on gif. 0.0 is at frame 0, 1.0 is last frame</li>
+          <li><b>stop</b>: float, if you want text to be animated, defines when text disappears on gif. 0.0 is at frame 0, 1.0 is last frame</li>
+      </ul><br />
+    </p>
+        
+    As an example, here is a config.yml file for the <i>vince</i> template:
+    <code style="text-align: left"><pre>
+name: Vince McMahon Reaction
+source: https://knowyourmeme.com/memes/vince-mcmahon-reaction
+text:
+  - style: default
+    color: black
+    font: thin
+    anchor_x: 0.0
+    anchor_y: 0.0
+    angle: 0.0
+    scale_x: 0.495
+    scale_y: 0.315
+    align: center
+    start: 0.1
+    stop: 1.0
+  - style: default
+    color: black
+    font: thin
+    anchor_x: 0.0
+    anchor_y: 0.32
+    angle: 0.0
+    scale_x: 0.495
+    scale_y: 0.357
+    align: center
+    start: 0.4
+    stop: 1.0
+  - style: default
+    color: black
+    font: thin
+    anchor_x: 0.0
+    anchor_y: 0.68
+    angle: 0.0
+    scale_x: 0.495
+    scale_y: 0.32
+    align: center
+    start: 0.7
+    stop: 1.0
+example:
+  - 2-Day Delivery
+  - Overnight Shipping
+  - Shopping at the Store
+overlay:
+  - center_x: 0.25
+    center_y: 0.155
+    angle: 0.0
+    scale: 0.3
+  - center_x: 0.25
+    center_y: 0.5
+    angle: 0.0
+    scale: 0.3
+  - center_x: 0.25
+    center_y: 0.84
+    angle: 0.0
+    scale: 0.3
+    </pre></code>
+    <br />
+</div>
+{% endblock %}
