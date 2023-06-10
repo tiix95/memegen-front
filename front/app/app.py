@@ -44,22 +44,28 @@ def get_templates_list():
 def index():
     return render_template('index.html', templates_list=get_templates_list())
 
-@app.route('/edit/<string:template_name>', methods=["GET"])
-def edit(template_name):
+@app.route('/create/<string:template_name>', methods=["GET"])
+def create(template_name):
     templates_list = get_templates_list()
     if not template_name in templates_list.keys():
         return 404
     template = templates_list[template_name]
     base_url = request.host_url
-    return render_template('edit.html', template=template, id=template_name, base_url=base_url.rstrip('/'))
+    return render_template('create.html', template=template, id=template_name, base_url=base_url.rstrip('/'))
 
-@app.route('/upload', methods=["POST"])
+@app.route('/upload', methods=["GET", "POST"])
 def upload():
+    if request.method == "GET":
+        return render_template('upload.html')
     return 404
+    
     # TODO upload the template
     # get_templates_list.cache_clear()
-    # return render_template('index.html', message="Your template was uploaded")
+    # return render_template('upload.html', message="Your template was uploaded")
 
+@app.route('/upload_doc', methods=["GET"])
+def doc():
+    return render_template('upload_doc.html')
 
 if __name__ == '__main__':
     # To get the cache warm

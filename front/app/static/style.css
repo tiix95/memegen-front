@@ -36,8 +36,9 @@ img#preview {
     margin-bottom: 20px;
 }
 
-input {
+textarea {
     margin: 10px;
+    vertical-align: middle;
 }
 
 .floating-button {
@@ -55,4 +56,9 @@ input {
     z-index: 9999;
     width: 70px;
     height: 70px;
+}
+
+textarea#yml {
+    width: 100%;
+    height: 80vh;
 }
