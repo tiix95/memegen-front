@@ -2,8 +2,10 @@
 
 ## Some background on the project
 
-Blabla
-Honnêtement c'est pas dingue comme code, l'UX est moins bien que imgflip, mais bon c'est on-premise et basé sur un tool déjà existant que j'ai pas à maintenir.
+Sometimes you just want to meme, but you don't want to send your meme data over the internet. Of course you could use memegen directly, but it is only an API and does not provide a front-end. So I built one, and while I'm at it, I also handled the local deployment for you, with an nginx reverse proxy. So now, with just three commands, **you can meme fully on-premise** :)  
+**ATTENTION** Note that I don't control the memegen repo, and the local memegen instance could as well receive an update that make it return a webpage containing a Google Analytics tag or any other tracker, so please if you put it on premise, block outbound traffic to Google when looking at a meme. It is on my TODO-list to break these tags on the fly with Nginx.  
+
+To be fair, this is a one-night project. The code could be refactored, the UX is not that great, and there are a thousand things that could be done better. As one would say : it ain't much, but it's honest work.
 
 ## Installation
 
