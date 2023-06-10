@@ -8,7 +8,7 @@ Honnêtement c'est pas dingue comme code, l'UX est moins bien que imgflip, mais 
 ## Installation
 
 ```bash
-git clone --recurse-submodules ...
+git clone --recurse-submodules https://github.com/Antoine-Gicquel/memegen-front.git
 ```
 
 This project works great with `podman compose` :
