@@ -1,0 +1,58 @@
+table#list {
+    border: 1px solid grey;
+}
+
+td, th {
+    padding: 10px;
+}
+
+table#list img {
+    max-width: 250px;
+    max-height: 250px;
+}
+
+table#tableedit img {
+    max-width: 900px;
+    max-height: 650px;
+}
+
+table {
+    width: 100%
+}
+
+table#list tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+body {
+    margin: auto;
+    width: auto;
+    text-align: center;
+}
+
+img#preview {
+    margin: auto;
+    margin-top: 15px;
+    margin-bottom: 20px;
+}
+
+input {
+    margin: 10px;
+}
+
+.floating-button {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    background-color: #ff5722;
+    color: #fff;
+    border-radius: 50%;
+    font-size: 45px;
+    vertical-align: middle;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+    z-index: 9999;
+    width: 70px;
+    height: 70px;
+}

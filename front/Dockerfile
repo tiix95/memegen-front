@@ -1,0 +1,41 @@
+# Base image
+FROM python:3.11-bullseye
+
+# Set the working directory in the container
+WORKDIR /app
+
+# Create a new user and group with restricted privileges
+RUN groupadd -r appgroup && useradd -r -g appgroup appuser
+
+# Copy the requirements file to the working directory
+COPY requirements.txt .
+
+# Install the Python dependencies
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy the application code to the container
+COPY ./app/ .
+
+# Change the ownership of the application files to the appuser
+RUN chown -R appuser:appgroup /app
+
+# Reduce container privileges
+RUN chown root:root /usr/local/bin && \
+    chmod go-w /usr/local/bin && \
+    chown root:root /usr/local/lib/python* && \
+    chmod go-w /usr/local/lib/python* && \
+    chown root:root /app && \
+    chmod go-w /app && \
+    chmod -R go-w /app/*
+
+# Expose the port on which the Flask app will run
+EXPOSE 5000
+
+# Set the environment variable for Flask
+ENV FLASK_APP=app.py
+
+# Switch to the non-root user
+USER appuser
+
+# Set the command to run the Flask application
+CMD ["flask", "run", "--host=0.0.0.0"]
