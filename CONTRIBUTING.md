@@ -6,10 +6,6 @@ If you want to improve the UI, go on !
 
 
 ## Short TODO-list
-
-### Upstream
 - Add possibility to upload template
-
-### Here
 - Beautify the code
 - Beautify the UI
