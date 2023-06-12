@@ -33,3 +33,4 @@ services:
 networks:
   front_net:
   back_net:
+    infernal: true
