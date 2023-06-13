@@ -58,7 +58,7 @@ def create(template_name):
         return 404
     template = templates_list[template_name]
     base_url = request.host_url
-    return render_template('edit.html', template=template, id=template_name)
+    return render_template('create.html', template=template, id=template_name)
 
 @app.route('/upload', methods=["GET", "POST"])
 def upload():
