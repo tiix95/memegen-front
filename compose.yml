@@ -14,17 +14,25 @@ services:
       - api
 
   front:
-    build: ./front/
+    build: 
+      context: ./front/
+      dockerfile: Containerfile
     networks:
       - back_net
+    # volumes:
+    #   - 'memes_templates:/app/memes/templates'
     depends_on:
       api:
         condition: service_healthy
 
   api:
-    build: ./memegen/
+    build:
+      context: ./memegen/
+      dockerfile: Containerfile
     networks:
       - back_net
+    # volumes:
+    #   - 'memes_templates:/opt/memegen/templates:ro'
     healthcheck:
       test: ["CMD-SHELL", "curl --fail http://api:5000/images || exit 1"]
       interval: 10s
@@ -34,3 +42,11 @@ networks:
   front_net:
   back_net:
     internal: true
+
+volumes:
+  memes_templates:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: "./memegen/templates"

@@ -24,14 +24,20 @@
                 </form>
             </td>
             <td>
-                config.yml<br />
                 <form id="editor">
-                    <textarea id="yml" name="yml"></textarea>
+                    <label for="tag">Template Tag Name<br />
+                        <input type="text" id="tag" name="tag"></input>
+                    </label><br /><br />
+                    <label for="yml">config.yml
+                        <textarea id="yml" name="yml"></textarea>
+                    </label><br />
                 </form>
             </td>
         </tr>
     </table>
     <br />
+
+    <button id="upload">Upload Template!</button>
 
     <script>
         document.getElementById("imgInp").addEventListener(
