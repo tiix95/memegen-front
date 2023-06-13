@@ -1,12 +1,19 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect
+from flask import json as flask_json
 from dataclasses import dataclass
 from urllib.parse import urlparse
+from hashlib import md5
+from time import time
 import requests
 import json
 import asyncio
 import os
 import sys
 from functools import lru_cache
+import cachetools
+
+ttl_cache = cachetools.TTLCache(maxsize=2048, ttl=31 * 24 * 60 * 60)
+
 
 app = Flask(__name__)
 MEMEGEN_API = "http://api:5000"
@@ -51,7 +58,7 @@ def edit(template_name):
         return 404
     template = templates_list[template_name]
     base_url = request.host_url
-    return render_template('edit.html', template=template, id=template_name, base_url=base_url.rstrip('/'))
+    return render_template('edit.html', template=template, id=template_name)
 
 @app.route('/upload', methods=["POST"])
 def upload():
@@ -60,6 +67,19 @@ def upload():
     # get_templates_list.cache_clear()
     # return render_template('index.html', message="Your template was uploaded")
 
+@app.route('/shorten', methods=["GET"])
+def shorten():
+    global ttl_cache
+    p = request.args.get("path")
+    tag = md5((str(time()) + p).encode()).hexdigest()
+    ttl_cache[tag] = p
+    return flask_json.dumps({'path': p, 'tag': tag})
+
+@app.route('/meme/<string:tag>', methods=["GET"])
+def short_redirect(tag):
+    global ttl_cache
+    p = ttl_cache[tag]
+    return redirect(p, code=302)
 
 if __name__ == '__main__':
     # To get the cache warm

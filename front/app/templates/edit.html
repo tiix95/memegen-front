@@ -4,10 +4,11 @@
 <div class="container">
     <a href="/" class="floating-button">&#8592;</a>
     <h1>Generate The Meme</h1>
+    <div id="notification" class="alert" role="alert" hidden></div>
     <p>
         Type in an input field (and then click elsewhere) to see a live preview !<br />
         When you are done editing, simply share the URL below to all your bros out there
-    </p><br />
+    </p>
 
     <table id="tableedit">
         <tr>
@@ -26,9 +27,8 @@
     </table>
     
     <br />
-    
-    Here is your meme URL : <a href="" id="result">Waiting for your talent...</a></a>
-
+    <button id="refreshLink">Get the URL !</button>
+    <p id="linkParagraph" hidden>Here is your meme URL : <a href="" id="result">Loading...</a></p>
     <script>
         const conversions = {
             '_': '__',
@@ -50,13 +50,63 @@
         };
         const meme_id = "{{ id }}";
         const meme_ext = "{{ template.extension }}";
-        const base_url = "{{ base_url }}";
+        const base_url = location.protocol + '//' + location.host;
 
         document.getElementById("editor").addEventListener(
             'change',
-            function() { var new_url = getUrl(); refreshLink(new_url); refreshPreview(new_url);},
+            () => {
+                var new_url = getUrl();
+                refreshPreview(new_url);
+            },
             false
         );
+
+        document.getElementById("refreshLink").addEventListener(
+            "click",
+            () => {
+                var new_url = getUrl();
+                refreshLink(new_url);
+                document.getElementById("linkParagraph").hidden = false;
+            },
+            false
+        );
+
+        document.getElementById("result").addEventListener(
+            "click",
+            (e) => {
+                e.preventDefault();
+                navigator.clipboard.writeText(document.getElementById("result").text).then(() => {
+                    console.log('Content copied to clipboard');
+                    var notification = document.getElementById("notification");
+                    notification.innerHTML = "Copied to clipboard";
+                    notification.classList.remove("alert-danger");
+                    notification.classList.add("alert-success");
+                    notification.hidden = false;
+                    var clearNotif = setInterval(() => {
+                        clearInterval(clearNotif);
+                        notification.hidden = true;
+                    }, 5000);
+                    /* Resolved - text copied to clipboard successfully */
+                    return false
+                },() => {
+                    console.error('Failed to copy');
+                    var notification = document.getElementById("notification");
+                    notification.innerHTML = "Could not copy to clipboard... (most likely because site is not over HTTPS, see you in prod !)";
+                    notification.classList.remove("alert-success");
+                    notification.classList.add("alert-danger");
+                    notification.hidden = false;
+                    var clearNotif = setInterval(() => {
+                        clearInterval(clearNotif);
+                        notification.hidden = true;
+                    }, 5000);
+                    /* Rejected - text failed to copy to the clipboard */
+                    return false;
+                });
+                return false;
+            },
+            false
+        );
+
 
         function convertToMemeGenText(txt) {
             Object.entries(conversions).forEach(([key, value]) => {
@@ -80,9 +130,22 @@
         }
 
         function refreshLink(meme_url) {
-            var result = document.getElementById("result");
-            result.text = base_url + meme_url;
-            result.href = meme_url;
+            const Http = new XMLHttpRequest();
+            const url = '/shorten?path=' + meme_url;
+            Http.open("GET", url);
+            Http.send();
+
+            Http.onreadystatechange = (e) => {
+                try {
+                    const tag = JSON.parse(Http.responseText)['tag'];
+                    const short_meme_url = '/meme/'+tag;
+                    var result = document.getElementById("result");
+                    result.text = base_url + short_meme_url;
+                    result.href = short_meme_url;
+                } catch (error) {
+                    console.log(error);
+                }
+            }
         }
 
         function refreshPreview(meme_url) {
