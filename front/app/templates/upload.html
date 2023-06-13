@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <a href="/" class="floating-button">&#8592;</a>
+    <h1>Upload The Meme Template</h1>
+    {% if message is defined %}
+    <div class="alert alert-success" role="alert">
+        <h4 class="alert-heading">Confirmation!</h4>
+        <p>{{ message }}</p>
+    </div>
+    {% endif %}
+    <p>
+        <a href="{{ url_for('doc') }}">Link to documentation</a><br />
+        <b>THIS DOES NOT WORK YET!!!</b>
+    </p>
+
+    <table id="tableupload">
+        <tr>
+            <td>
+                <form>
+                    <input accept="image/*" type='file' id="imgInp" /><br />
+                    <img id="imgPreview" src="#" alt="Image Preview" />
+                </form>
+            </td>
+            <td>
+                config.yml<br />
+                <form id="editor">
+                    <textarea id="yml" name="yml"></textarea>
+                </form>
+            </td>
+        </tr>
+    </table>
+    <br />
+
+    <script>
+        document.getElementById("imgInp").addEventListener(
+            'change',
+            function() { 
+                const [file] = document.getElementById("imgInp").files;
+                if (file) { document.getElementById("imgPreview").src = URL.createObjectURL(file); }
+            },
+            false
+        );
+    </script>
+</div>
+{% endblock %}

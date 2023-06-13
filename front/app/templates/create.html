@@ -2,7 +2,7 @@
 
 {% block content %}
 <div class="container">
-    <a href="/" class="floating-button">&#8592;</a>
+    <a href="{{ url_for('index') }}" class="floating-button">&#8592;</a>
     <h1>Generate The Meme</h1>
     <div id="notification" class="alert" role="alert" hidden></div>
     <p>
@@ -16,10 +16,11 @@
                 <img src="{{ template.image_url }}" id="preview" />
             </td>
             <td>
-                <form action="" id="editor">
+                <form id="editor">
                     {% for i in range(template.nb_lines) %}
-                        <label for="line-{{ i + 1 }}">Input #{{ i + 1 }}</label>
-                        <input type="text" id="line-{{ i + 1 }}" name="line-{{ i + 1 }}" /><br />
+                        <label for="line-{{ i + 1 }}">Input #{{ i + 1 }}
+                            <textarea id="line-{{ i + 1 }}" name="line-{{ i + 1 }}"></textarea>
+                        </label><br />
                     {% endfor %}
                 </form>
             </td>
