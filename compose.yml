@@ -19,8 +19,8 @@ services:
       dockerfile: Containerfile
     networks:
       - back_net
-    # volumes:
-    #   - 'memes_templates:/app/memes/templates'
+    volumes:
+      - 'memes_templates:/app/memes/templates'
     depends_on:
       api:
         condition: service_healthy
@@ -31,8 +31,8 @@ services:
       dockerfile: Containerfile
     networks:
       - back_net
-    # volumes:
-    #   - 'memes_templates:/opt/memegen/templates:ro'
+    volumes:
+      - 'memes_templates:/opt/memegen/templates'
     healthcheck:
       test: ["CMD-SHELL", "curl --fail http://api:5000/images || exit 1"]
       interval: 10s

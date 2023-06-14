@@ -6,6 +6,19 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                {% if category == 'message' %}
+                    <div class="alert alert-success" role="alert">
+                {% else %}
+                    <div class="alert alert-{{ category }}" role="alert">
+                {% endif %}
+                {{ message | safe }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
     {% block content %}{% endblock %}
 </body>
 </html>

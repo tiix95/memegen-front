@@ -1,11 +1,14 @@
 # Base image
 FROM docker.io/python:3.11-bullseye
 
+# Install python-magic
+RUN apt update && apt install -y python3-magic
+
 # Set the working directory in the container
 WORKDIR /app
 
 # Create a new user and group with restricted privileges
-RUN groupadd -r appgroup && useradd -r -g appgroup appuser
+RUN groupadd -r appgroup && useradd -u 1000 -r -g appgroup appuser
 
 # Copy the requirements file to the working directory
 COPY requirements.txt .

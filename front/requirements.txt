@@ -1,3 +1,6 @@
 Flask
 requests
 cachetools
+pyyaml
+schema
+python-magic

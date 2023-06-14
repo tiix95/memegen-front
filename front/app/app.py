@@ -1,5 +1,4 @@
-from flask import Flask, render_template, request, redirect
-from flask import json as flask_json
+from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
 from dataclasses import dataclass
 from urllib.parse import urlparse
 from hashlib import md5
@@ -9,14 +8,23 @@ import asyncio
 import os
 import sys
 import base64
+import yaml
 from functools import lru_cache
 import cachetools
+import magic
+import string
+import random
+
 
 ttl_cache = cachetools.TTLCache(maxsize=4096, ttl=31 * 24 * 60 * 60)
 
 
 app = Flask(__name__)
+app.config["MAX_CONTENT_LENGTH"] = 8*1000*1000
+app.secret_key = random.choices(population=string.ascii_letters, k=32)
 MEMEGEN_API = "http://api:5000"
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
+ALLOWED_MIMETYPES = {'image/png', 'image/jpeg'}
 
 
 @dataclass
@@ -72,12 +80,42 @@ def create(template_name):
 @app.route('/upload', methods=["GET", "POST"])
 def upload():
     if request.method == "GET":
-        return render_template('upload.html')
-    return 404
+        with open("/app/default_meme_config.yml", "r") as f:
+            return render_template('upload.html', default_config=f.read())
+        return 500
+    elif request.method == "POST":
+        # TODO add shitton of checks to check if the file is in the request etc etc
+
+        # Validation of tag
+        _tag = request.form.get("tag")
+        if not (isinstance(_tag, str) and len(_tag) < 30 and all(c in string.ascii_lowercase for c in _tag) and not (_tag in os.listdir("/app/memes/templates"))):
+            flash("Tag is not valid", category="danger")
+            return redirect(url_for('upload'))
+        
+        # Validation of image
+        _img = request.files["imgInp"]
+        _img_content = _img.read()
+        mime = magic.Magic(mime=True)
+        if not ('.' in _img.filename and _img.filename.rsplit('.')[-1].lower() in ALLOWED_EXTENSIONS and mime.from_buffer(_img_content) in ALLOWED_MIMETYPES):
+            flash("Image file not valid", category="danger")
+            return redirect(url_for('upload'))
+        _filename = "default." + _img.filename.rsplit('.')[-1].lower()
+        
+        # Validation of config.yml
+        _yml = request.form.get("yml")
+        # TODO validate yaml file structure with schema & pyyaml
+
+        os.mkdir(f'/app/memes/templates/{_tag}', mode=0o755)
+        with open(f'/app/memes/templates/{_tag}/{_filename}', 'wb+') as f:
+            f.write(_img_content)
+        with open(f'/app/memes/templates/{_tag}/config.yml', 'w+') as f:
+            f.write(_yml)
+
+        get_templates_list.cache_clear()
+        flash("Your template was uploaded ! Go check it out <a href=\"" + url_for('create', template_name=_tag) + "\">here !</a>")
+        return redirect(url_for('index'))
     
-    # TODO upload the template
-    # get_templates_list.cache_clear()
-    # return render_template('upload.html', message="Your template was uploaded")
+    return 404
 
 @app.route('/upload_doc', methods=["GET"])
 def doc():
@@ -91,15 +129,18 @@ def shorten():
     if filter_path_to_shorten(p):
         tag = base64.urlsafe_b64encode(md5(p.encode()).digest()).decode().strip('=')
         ttl_cache[tag] = p
-        return flask_json.dumps({'path': p, 'tag': tag})
+        return jsonify({'path': p, 'tag': tag})
     else:
         return 403
 
 @app.route('/meme/<string:tag>', methods=["GET"])
 def short_redirect(tag):
     global ttl_cache
-    p = ttl_cache[tag]
-    return redirect(p, code=302)
+    if tag in ttl_cache.keys():
+        p = ttl_cache[tag]
+        return redirect(p, code=302)
+    flash("Meme not found, sorry", category="danger")
+    return redirect(url_for('index'))
 
 
 if __name__ == '__main__':
