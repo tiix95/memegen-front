@@ -22,6 +22,11 @@
                             <textarea id="line-{{ i + 1 }}" name="line-{{ i + 1 }}"></textarea>
                         </label><br />
                     {% endfor %}
+                    {% for i in range(template.nb_overlays) %}
+                        <label for="ol-{{ i + 1 }}">Overlay #{{ i + 1 }} (optional) <b>WIP, not available!</b>
+                            <input accept="image/*" type="file" id="ol-{{ i + 1 }}" name="ol-{{ i + 1 }}"></input>
+                        </label><br />
+                    {% endfor %}
                 </form>
             </td>
         </tr>

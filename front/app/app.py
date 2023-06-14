@@ -32,6 +32,7 @@ class MemeTemplate:
     image_url: str
     name: str
     nb_lines: int
+    nb_overlays: int
     extension: str
 
 
@@ -50,7 +51,7 @@ def get_templates_list():
         name = temp["name"]
         if name.strip() == "":
             name = temp["id"]
-        _templates_list[temp["id"]] = MemeTemplate(img_url, name, temp["lines"], ext)
+        _templates_list[temp["id"]] = MemeTemplate(img_url, name, temp["lines"], temp["overlays"], ext)
     return _templates_list
 
 def filter_path_to_shorten(p):
