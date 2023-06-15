@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
+from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, make_response
 from dataclasses import dataclass
 from urllib.parse import urlparse
 from hashlib import md5
@@ -16,11 +16,13 @@ import string
 import random
 
 
-ttl_cache = cachetools.TTLCache(maxsize=4096, ttl=31 * 24 * 60 * 60)
+url_shortener_dict = cachetools.TTLCache(maxsize=4096, ttl=31 * 24 * 60 * 60)
+overlays_dict = cachetools.TTLCache(maxsize=64, ttl=31 * 24 * 60 * 60)
+
 
 
 app = Flask(__name__)
-app.config["MAX_CONTENT_LENGTH"] = 8*1000*1000
+app.config["MAX_CONTENT_LENGTH"] = 4*1000*1000
 app.secret_key = random.choices(population=string.ascii_letters, k=32)
 MEMEGEN_API = "http://api:5000"
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
@@ -35,6 +37,10 @@ class MemeTemplate:
     nb_overlays: int
     extension: str
 
+@dataclass
+class Overlay:
+    content: str
+    mime: str
 
 @lru_cache(maxsize=None)
 def get_templates_list():
@@ -125,22 +131,48 @@ def doc():
 @app.route('/shorten', methods=["GET"])
 def shorten():
     # Maybe Open Redirect here ? Maybe not ?
-    global ttl_cache
+    global url_shortener_dict
     p = request.args.get("path")
     if filter_path_to_shorten(p):
         tag = base64.urlsafe_b64encode(md5(p.encode()).digest()).decode().strip('=')
-        ttl_cache[tag] = p
+        url_shortener_dict[tag] = p
         return jsonify({'path': p, 'tag': tag})
     else:
         return 403
 
 @app.route('/meme/<string:tag>', methods=["GET"])
 def short_redirect(tag):
-    global ttl_cache
-    if tag in ttl_cache.keys():
-        p = ttl_cache[tag]
+    global url_shortener_dict
+    if tag in url_shortener_dict.keys():
+        p = url_shortener_dict[tag]
         return redirect(p, code=302)
     flash("Meme not found, sorry", category="danger")
+    return redirect(url_for('index'))
+
+@app.route('/overlay', methods=["POST"])
+def overlay(tag):
+    global overlays_dict
+    _img = request.files["overlay"]
+    _img_content = _img.read()
+    name = md5(_img_content).hexdigest()
+    if not name in overlays_dict.keys():
+        mime = magic.Magic(mime=True)
+        mtype = mime.from_buffer(_img_content)
+        if not mtype in ALLOWED_MIMETYPES:
+            return 404
+    
+        o = Overlay(content=_img_content, mime=mtype)
+        overlays_dict[name] = o
+    return jsonify({"tag": name})
+
+@app.route('/overlay/<string:tag>', methods=["GET"])
+def overlay(tag):
+    global overlays_dict
+    if tag in overlays_dict.keys():
+        p = overlays_dict[tag]
+        return make_response(p.content, code=200, mimetype=p.mime)
+    # TODO return an image saying overlay not found
+    flash("Overlay not found, sorry", category="danger")
     return redirect(url_for('index'))
 
 
