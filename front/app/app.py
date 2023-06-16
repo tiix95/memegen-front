@@ -8,6 +8,7 @@ import asyncio
 import os
 import sys
 import base64
+from schema import Schema, SchemaError, Optional, And
 import yaml
 from functools import lru_cache
 import cachetools
@@ -19,6 +20,30 @@ import random
 url_shortener_dict = cachetools.TTLCache(maxsize=4096, ttl=31 * 24 * 60 * 60)
 overlays_dict = cachetools.TTLCache(maxsize=64, ttl=31 * 24 * 60 * 60)
 
+
+config_schema = Schema({
+    "name": str,
+    "text": [{
+        "style": str,
+        "color": str,
+        "font": str,
+        "anchor_x": And(float, lambda x: 0<=x<=1),
+        "anchor_y": And(float, lambda x: 0<=x<=1),
+        "angle": float,
+        "scale_x": And(float, lambda x: 0<=x<=1),
+        "scale_y": And(float, lambda x: 0<=x<=1),
+        "align": str,
+        "start": And(float, lambda x: 0<=x<=1),
+        "stop": And(float, lambda x: 0<=x<=1)
+    }],
+    Optional("example"): [str],
+    Optional("overlay"): [{
+        "center_x": And(float, lambda x: 0<=x<=1),
+        "center_y": And(float, lambda x: 0<=x<=1),
+        "angle": float,
+        "scale": And(float, lambda x: 0<=x<=1)
+    }]
+})
 
 
 app = Flask(__name__)
@@ -61,9 +86,8 @@ def get_templates_list():
     return _templates_list
 
 def filter_path_to_shorten(p):
-    if "//" in p:
-        return False
-    for c in " \n?&%#\\<>\"":
+    print(p, file=sys.stderr, flush=True)
+    for c in " \n&%#\\<>\"":
         if c in p:
             return False
     if not p.startswith('/api/images/'):
@@ -89,10 +113,7 @@ def upload():
     if request.method == "GET":
         with open("/app/default_meme_config.yml", "r") as f:
             return render_template('upload.html', default_config=f.read())
-        return 500
     elif request.method == "POST":
-        # TODO add shitton of checks to check if the file is in the request etc etc
-
         # Validation of tag
         _tag = request.form.get("tag")
         if not (isinstance(_tag, str) and len(_tag) < 30 and all(c in string.ascii_lowercase for c in _tag) and not (_tag in os.listdir("/app/memes/templates"))):
@@ -100,6 +121,9 @@ def upload():
             return redirect(url_for('upload'))
         
         # Validation of image
+        if not "imgInp" in request.files.keys():
+            flash("No file was given", category="danger")
+            return redirect(url_for('upload'))
         _img = request.files["imgInp"]
         _img_content = _img.read()
         mime = magic.Magic(mime=True)
@@ -110,7 +134,12 @@ def upload():
         
         # Validation of config.yml
         _yml = request.form.get("yml")
-        # TODO validate yaml file structure with schema & pyyaml
+        try:
+            configuration = yaml.safe_load(_yml)
+            config_schema.validate(configuration)
+        except:
+            flash("Yaml not valid, see documentation", category="danger")
+            return redirect(url_for('upload'))
 
         os.mkdir(f'/app/memes/templates/{_tag}', mode=0o755)
         with open(f'/app/memes/templates/{_tag}/{_filename}', 'wb+') as f:
@@ -133,12 +162,17 @@ def shorten():
     # Maybe Open Redirect here ? Maybe not ?
     global url_shortener_dict
     p = request.args.get("path")
+    p = base64.urlsafe_b64decode(p + '=' * (-len(p) % 4)).decode()
+    print("aaa", file=sys.stderr, flush=True)
     if filter_path_to_shorten(p):
+        print("bbb", file=sys.stderr, flush=True)
         tag = base64.urlsafe_b64encode(md5(p.encode()).digest()).decode().strip('=')
         url_shortener_dict[tag] = p
         return jsonify({'path': p, 'tag': tag})
     else:
-        return 403
+        print("ccc", file=sys.stderr, flush=True)
+        return "Unauthorized", 403
+    print("ddd", file=sys.stderr, flush=True)
 
 @app.route('/meme/<string:tag>', methods=["GET"])
 def short_redirect(tag):
@@ -150,7 +184,7 @@ def short_redirect(tag):
     return redirect(url_for('index'))
 
 @app.route('/overlay', methods=["POST"])
-def overlay(tag):
+def overlay_upload():
     global overlays_dict
     _img = request.files["overlay"]
     _img_content = _img.read()
@@ -170,7 +204,9 @@ def overlay(tag):
     global overlays_dict
     if tag in overlays_dict.keys():
         p = overlays_dict[tag]
-        return make_response(p.content, code=200, mimetype=p.mime)
+        r = make_response(p.content, 200)
+        r.mimetype = p.mime
+        return r
     # TODO return an image saying overlay not found
     flash("Overlay not found, sorry", category="danger")
     return redirect(url_for('index'))
