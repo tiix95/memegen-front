@@ -13,25 +13,25 @@ To be fair, this is a one-night project. The code could be refactored, the UX is
 git clone --recurse-submodules https://github.com/Antoine-Gicquel/memegen-front.git
 ```
 
-This project works great with `podman compose` :
+This project works great with the most recent versions of `podman compose` :
 
 ```bash
 # In Debian repos since Debian 12
 sudo apt install -y podman podman-compose
-
-# Else
-sudo apt install -y podman python3 python3-pip
-# If podman --version is smaller than 3.1
-pip3 install podman-compose~=0.1
-# Else
-pip3 install podman-compose
 ```
+
+Else, you can use `docker` and `docker compose` (install as usual)
 
 ## Starting the meme generator
 
 ```bash
 podman-compose build
 podman-compose up
+```
+or
+```bash
+docker compose build
+docker compose up
 ```
 
 And let's meet on http://localhost:8000/ !
