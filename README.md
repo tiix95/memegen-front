@@ -34,4 +34,4 @@ docker compose build
 docker compose up
 ```
 
-And let's meet on http://localhost:8000/ !
+And let's meet on http://localhost:8080/ !

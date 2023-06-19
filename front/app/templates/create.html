@@ -112,7 +112,7 @@
             false
         );
 
-        document.getElementById("result").addEventListener(
+        /* document.getElementById("result").addEventListener(
             "click",
             (e) => {
                 e.preventDefault();
@@ -127,7 +127,6 @@
                         clearInterval(clearNotif);
                         notification.hidden = true;
                     }, 5000);
-                    /* Resolved - text copied to clipboard successfully */
                     return false
                 },() => {
                     console.error('Failed to copy');
@@ -140,13 +139,12 @@
                         clearInterval(clearNotif);
                         notification.hidden = true;
                     }, 5000);
-                    /* Rejected - text failed to copy to the clipboard */
                     return false;
                 });
                 return false;
             },
             false
-        );
+        ); */
 
 
         function convertToMemeGenText(txt) {
