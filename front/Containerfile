@@ -10,12 +10,6 @@ WORKDIR /app
 # Create a new user and group with restricted privileges
 RUN groupadd -r appgroup && useradd -u 1000 -r -g appgroup appuser
 
-# Copy the requirements file to the working directory
-COPY requirements.txt .
-
-# Install the Python dependencies
-RUN pip install --no-cache-dir -r requirements.txt
-
 # Copy the application code to the container
 COPY ./app/ .
 
@@ -26,10 +20,16 @@ RUN chown -R appuser:appgroup /app
 RUN chown root:root /usr/local/bin && \
     chmod go-w /usr/local/bin && \
     chown root:root /usr/local/lib/python* && \
-    chmod go-w /usr/local/lib/python* && \
-    chown root:root /app && \
-    chmod go-w /app && \
-    chmod -R go-w /app/*
+    chmod go-w /usr/local/lib/python*
+
+# Change user for the rest of the Containerfile
+USER appuser
+
+# Copy the requirements file to the working directory
+COPY requirements.txt .
+
+# Install the Python dependencies
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Expose the port on which the Flask app will run
 EXPOSE 5001
