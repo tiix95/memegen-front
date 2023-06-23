@@ -147,14 +147,26 @@
         ); */
 
         function urlsafe_b64encode(txt) {
-            return btoa(txt).replace('+', '-').replace('/', '_').replace('=', '').replace('=', '').replace('=', '')
+
+            function b64EncodeUnicode(str) {
+                // first we use encodeURIComponent to get percent-encoded UTF-8,
+                // then we convert the percent encodings into raw bytes which
+                // can be fed into btoa.
+                return btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g,
+                    function toSolidBytes(match, p1) {
+                        return String.fromCharCode('0x' + p1);
+                }));
+            }
+            return b64EncodeUnicode(txt).replace('+', '-').replace('/', '_').replace('=', '').replace('=', '').replace('=', '').replace('=', '');
         }
 
         function getUrl() {
             var form_content = document.getElementsByClassName("line");
             var lines_content = [];
             for (var i = 0, element; element = form_content[i++];) {
-                lines_content.push(urlsafe_b64encode(element.value));
+                var val = element.value;
+                if (val === "") val = " ";
+                lines_content.push(urlsafe_b64encode(val));
             }
 
             var custom_overlays = '';
