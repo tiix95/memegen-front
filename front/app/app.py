@@ -162,7 +162,7 @@ def shorten():
     # Maybe Open Redirect here ? Maybe not ?
     global url_shortener_dict
     p = request.args.get("path")
-    p = base64.urlsafe_b64decode(p + '=' * (-len(p) % 4)).decode()
+    p = base64.urlsafe_b64decode(p + '=' * (-len(p) % 4)).decode('utf-8')
     print("aaa", file=sys.stderr, flush=True)
     if filter_path_to_shorten(p):
         print("bbb", file=sys.stderr, flush=True)
