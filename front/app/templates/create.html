@@ -90,7 +90,7 @@
                 
                     xhr.onreadystatechange = function() {//Call a function when the state changes.
                         if(xhr.readyState == 4 && xhr.status == 200) {
-                            overlay_urls[parseInt(t.id.split('-')[1]) - 1] = "http://front:5001/overlay/" + JSON.parse(xhr.responseText)['tag'];
+                            overlay_urls[parseInt(t.id.split('-')[1]) - 1] = JSON.parse(xhr.responseText)['tag'];
                             var new_url = getUrl();
                             refreshPreview(new_url);
                         }
@@ -146,22 +146,15 @@
             false
         ); */
 
-
-        function convertToMemeGenText(txt) {
-            Object.entries(conversions).forEach(([key, value]) => {
-                txt = txt.split(key).join(value);
-            });
-            if (!txt) {
-                return '_';
-            }
-            return txt;
+        function urlsafe_b64encode(txt) {
+            return btoa(txt).replace('+', '-').replace('/', '_').replace('=', '').replace('=', '').replace('=', '')
         }
 
         function getUrl() {
             var form_content = document.getElementsByClassName("line");
             var lines_content = [];
             for (var i = 0, element; element = form_content[i++];) {
-                lines_content.push(convertToMemeGenText(element.value));
+                lines_content.push(urlsafe_b64encode(element.value));
             }
 
             var custom_overlays = '';
@@ -175,7 +168,7 @@
 
         function refreshLink(meme_url) {
             const Http = new XMLHttpRequest();
-            const b64memeurl = btoa(meme_url).replace('+', '-').replace('/', '_').replace('=', '').replace('=', '').replace('=', '');
+            const b64memeurl = urlsafe_b64encode(meme_url);
             const url = '/shorten?path=' + b64memeurl;
             Http.open("GET", url);
             Http.send();

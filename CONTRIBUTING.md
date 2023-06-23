@@ -5,6 +5,11 @@ I have no guidelines as to how to do the stuff. Ideally, if you could work upstr
 If you want to improve the UI, go on !
 
 
-## Short TODO-list
+## High level TODO-list
 - Beautify the code
 - Beautify the UI
+
+## Low-level TODO-list
+- test all the features
+- have a smoother `Upload template` UX
+- minify meme templates to speed up the front page loading time and cache weight
