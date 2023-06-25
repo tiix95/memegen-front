@@ -33,6 +33,7 @@ services:
       - back_net
     environment:
       - MEMEGEN_WATERMARK=your.watermark
+      - MEMEGEN_BASE64=1
       - MEMEGEN_DEFAULT_OVERLAY_PREFIX=http://front:5001/overlay/
     volumes:
       - 'memes_templates:/opt/memegen/templates'

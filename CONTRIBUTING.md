@@ -10,6 +10,5 @@ If you want to improve the UI, go on !
 - Beautify the UI
 
 ## Low-level TODO-list
-- Debug new overlays
 - have a smoother `Upload template` UX
 - minify meme templates to speed up the front page loading time and cache weight
