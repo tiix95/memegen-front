@@ -4,3 +4,4 @@ cachetools
 pyyaml
 schema
 python-magic
+Pillow

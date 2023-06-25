@@ -1,0 +1,26 @@
+name: {{ name }}
+text:
+  {% for t in text_blocks %}
+  - style: {{ t.style }}
+    color: {{ t.color }}
+    font: {{ t.font }}
+    anchor_x: {{ t.anchor_x }}
+    anchor_y: {{ t.anchor_y }}
+    angle: {{ t.angle }}
+    scale_x: {{ t.scale_x }}
+    scale_y: {{ t.scale_y }}
+    align: {{ t.align }}
+    start: 0.0
+    stop: 1.0
+  {% endfor %}
+example:
+  {% for t in text_blocks %}
+  - {{ t.example }}
+  {% endfor %}
+overlay:
+  # overlay a custom image at a specific position
+  - center_x: 0.5
+    center_y: 0.5
+    angle: 0.0
+    # overlay size in terms of base image size
+    scale: 0.25

@@ -11,4 +11,3 @@ If you want to improve the UI, go on !
 
 ## Low-level TODO-list
 - have a smoother `Upload template` UX
-- minify meme templates to speed up the front page loading time and cache weight

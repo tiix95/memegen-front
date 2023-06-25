@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, make_response
+from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, make_response, send_file
 from dataclasses import dataclass
 from urllib.parse import urlparse
 from hashlib import md5
@@ -15,11 +15,11 @@ import cachetools
 import magic
 import string
 import random
+from PIL import Image
 
 
-url_shortener_dict = cachetools.TTLCache(maxsize=4096, ttl=31 * 24 * 60 * 60)
-overlays_dict = cachetools.TTLCache(maxsize=64, ttl=31 * 24 * 60 * 60)
-
+url_shortener_dict = cachetools.LRUCache(maxsize=2048)
+overlays_dict = cachetools.LRUCache(maxsize=64)
 
 config_schema = Schema({
     "name": str,
@@ -52,11 +52,14 @@ app.secret_key = random.choices(population=string.ascii_letters, k=32)
 MEMEGEN_API = "http://api:5000"
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 ALLOWED_MIMETYPES = {'image/png', 'image/jpeg'}
+TEMPLATES_DIR = "/app/memes/templates"
+MINI_SIZE_MAX = 200
 
 
 @dataclass
 class MemeTemplate:
     image_url: str
+    mini_image_url: str
     name: str
     nb_lines: int
     nb_overlays: int
@@ -66,6 +69,31 @@ class MemeTemplate:
 class Overlay:
     content: str
     mime: str
+
+
+def compress(template_name):
+    def resize_max(_s):
+        _x, _y = _s
+        m = max(_x, _y)
+        if m > MINI_SIZE_MAX:
+            ratio = MINI_SIZE_MAX / m
+            _x = round(_x*ratio)
+            _y = round(_y*ratio)
+        return _x, _y
+    # Check if template_name exists
+    if template_name in os.listdir(TEMPLATES_DIR):
+        dirlist = os.listdir(os.path.join(TEMPLATES_DIR, template_name))
+        if not 'mini.jpeg' in dirlist:
+            filename = [x for x in dirlist if x.startswith("default.")][0]
+            filepath = os.path.join(TEMPLATES_DIR, template_name, filename)
+            image = Image.open(filepath)
+            new_s = resize_max(image.size)
+            image.resize(new_s)
+            jpeg_image = image.convert('RGB')
+            jpeg_image.save(os.path.join(TEMPLATES_DIR, template_name, "mini.jpeg"), "JPEG", optimize = True, quality = 40)
+        return True
+    else:
+        return False
 
 @lru_cache(maxsize=None)
 def get_templates_list():
@@ -78,16 +106,16 @@ def get_templates_list():
         temp = json.loads(r.text)
         img_url = urlparse(temp["blank"]).path
         img_url = "/api" + img_url
+        mini_img_url = "/mini/" + base64.urlsafe_b64encode(temp["id"].encode()).decode().strip('=')
         ext = os.path.splitext(img_url)[-1].replace(".", "")
         name = temp["name"]
         if name.strip() == "":
             name = temp["id"]
-        _templates_list[temp["id"]] = MemeTemplate(img_url, name, temp["lines"], temp["overlays"], ext)
+        _templates_list[temp["id"]] = MemeTemplate(img_url, mini_img_url, name, temp["lines"], temp["overlays"], ext)
     return _templates_list
 
 def filter_path_to_shorten(p):
-    print(p, file=sys.stderr, flush=True)
-    for c in " \n&%#\\<>\"":
+    for c in list("' \n&%#\\<>\"+\t{}()[]:") + ["..", "//"]:
         if c in p:
             return False
     if not p.startswith('/api/images/'):
@@ -98,6 +126,15 @@ def filter_path_to_shorten(p):
 @app.route('/', methods=["GET"])
 def index():
     return render_template('index.html', templates_list=get_templates_list())
+
+@app.route('/mini/<string:_template_name>', methods=["GET"])
+def mini(_template_name):
+    template_name = base64.urlsafe_b64decode(_template_name + '=' * (-len(_template_name) % 4)).decode()
+    template_exists = compress(template_name)
+    if template_exists:
+        return send_file(os.path.join(TEMPLATES_DIR, template_name, "mini.jpeg"), mimetype='image/jpeg')
+    return "Not Found", 404
+
 
 @app.route('/create/<string:template_name>', methods=["GET"])
 def create(template_name):
@@ -116,8 +153,14 @@ def upload():
     elif request.method == "POST":
         # Validation of tag
         _tag = request.form.get("tag")
-        if not (isinstance(_tag, str) and len(_tag) < 30 and all(c in string.ascii_lowercase for c in _tag) and not (_tag in os.listdir("/app/memes/templates"))):
+        if not (isinstance(_tag, str) and len(_tag) < 30 and all(c in string.ascii_lowercase for c in _tag) and not (_tag in os.listdir(TEMPLATES_DIR))):
             flash("Tag is not valid", category="danger")
+            return redirect(url_for('upload'))
+
+        # Validation of name
+        _name = request.form.get("longname")
+        if not isinstance(_name, str) and len(_name) < 1000:
+            flash("Long name is not valid", category="danger")
             return redirect(url_for('upload'))
         
         # Validation of image
@@ -134,6 +177,7 @@ def upload():
         
         # Validation of config.yml
         _yml = request.form.get("yml")
+        _yml = "name: " + _name + "\n" + _yml
         try:
             configuration = yaml.safe_load(_yml)
             config_schema.validate(configuration)

@@ -18,7 +18,7 @@
         <tbody>
             {% for template_id, template in templates_list.items() %}
             <tr>
-                <td><img src="{{ template.image_url }}" /></td>
+                <td><img src="{{ template.mini_image_url }}" /></td>
                 <td><a href="{{ url_for('create', template_name=template_id) }}">{{ template.name }}</a></td>
             </tr>
             {% endfor %}
