@@ -33,38 +33,6 @@
                             <input type="text" id="longname" name="longname" required></input>
                         </label><br /><br />
                     </fieldset>
-                    
-                    <fieldset id="text1">
-                        <legend>Input text 1</legend>
-                        <label for="style">Style<br />
-                            <input type="text" name="style" required></input>
-                        </label><br /><br />
-                        <label for="color">Color<br />
-                            <input type="text" name="color" required></input>
-                        </label><br /><br />
-                        <label for="font">Font<br />
-                            <input type="text" name="font" required></input>
-                        </label><br /><br />
-                        <label for="anchor_x">Anchor X<br />
-                            <input type="number" step="any" min="0" max="1" name="anchor_x" required></input>
-                        </label><br /><br />
-                        <label for="anchor_y">Anchor Y<br />
-                            <input type="number" step="any" min="0" max="1" name="anchor_y" required></input>
-                        </label><br /><br />
-                        <label for="angle">Angle<br />
-                            <input type="number" step="any" min="-180" max="180" name="angle" required></input>
-                        </label><br /><br />
-                        <label for="scale_x">Scale X<br />
-                            <input type="number" step="any" min="0" max="1" name="scale_x" required></input>
-                        </label><br /><br />
-                        <label for="scale_y">Scale Y<br />
-                            <input type="number" step="any" min="0" max="1" name="scale_y" required></input>
-                        </label><br /><br />
-                        <label for="example">Example Text<br />
-                            <input type="text" name="example" required></input>
-                        </label><br /><br />
-                    </fieldset>
-                    <button id="add-text-input">Add a text input</button>
 
                     <label for="yml">config.yml
                         <textarea id="yml" name="yml" required>{{ default_config }}</textarea>
@@ -78,8 +46,6 @@
 
 
     <script>
-        var nbTextInputs = 1;
-
         document.getElementById("imgInp").addEventListener(
             'change',
             function() { 
@@ -88,102 +54,6 @@
             },
             false
         );
-
-        document.getElementById('upload-form').addEventListener('submit', function(event) {
-            var fieldsets = document.getElementsByTagName('fieldset');
-            
-            for (var i = 0; i < fieldsets.length; i++) {
-                var fieldset = fieldsets[i];
-                var fieldsetID = fieldset.id;
-                
-                var inputs = fieldset.getElementsByTagName('input');
-                for (var j = 0; j < inputs.length; j++) {
-                    var input = inputs[j];
-                    input.name = fieldsetID + '-' + input.name;
-                }
-            }
-            return true;
-        });
-
-        document.getElementById('add-text-input').addEventListener('click', function(event) {
-            nbTextInputs++;
-            var newFieldset = document.createElement('fieldset');
-            newFieldset.id = 'text'+nbTextInputs;
-
-            var newStyle = document.createElement('input');
-            newStyle.type = 'text';
-            newStyle.name = 'style';
-            newStyle.required = true;
-
-            var newColor = document.createElement('input');
-            newColor.type = 'text';
-            newColor.name = 'color';
-            newColor.required = true;
-
-            var newFont = document.createElement('input');
-            newFont.type = 'text';
-            newFont.name = 'font';
-            newFont.required = true;
-
-            var newAnchorX = document.createElement('input');
-            newAnchorX.type = 'number';
-            newAnchorX.step = 'any';
-            newAnchorX.min = '0';
-            newAnchorX.max = '1';
-            newAnchorX.name = 'anchor_x';
-            newAnchorX.required = true;
-
-            var newAnchorY = document.createElement('input');
-            newAnchorY.type = 'number';
-            newAnchorY.step = 'any';
-            newAnchorY.min = '0';
-            newAnchorY.max = '1';
-            newAnchorY.name = 'anchor_y';
-            newAnchorY.required = true;
-
-            var newAngle = document.createElement('input');
-            newAngle.type = 'number';
-            newAngle.step = 'any';
-            newAngle.min = '-180';
-            newAngle.max = '180';
-            newAngle.name = 'angle';
-            newAngle.required = true;
-
-            var newScaleX = document.createElement('input');
-            newScaleX.type = 'number';
-            newScaleX.step = 'any';
-            newScaleX.min = '0';
-            newScaleX.max = '1';
-            newScaleX.name = 'scale_x';
-            newScaleX.required = true;
-
-            var newScaleY = document.createElement('input');
-            newScaleY.type = 'number';
-            newScaleY.step = 'any';
-            newScaleY.min = '0';
-            newScaleY.max = '1';
-            newScaleY.name = 'scale_y';
-            newScaleY.required = true;
-
-            var newExample = document.createElement('input');
-            newExample.type = 'text';
-            newExample.name = 'example';
-            newExample.required = true;
-
-            newFieldset.appendChild(newStyle);
-            newFieldset.appendChild(newColor);
-            newFieldset.appendChild(newFont);
-            newFieldset.appendChild(newAnchorX);
-            newFieldset.appendChild(newAnchorY);
-            newFieldset.appendChild(newAngle);
-            newFieldset.appendChild(newScaleX);
-            newFieldset.appendChild(newScaleY);
-            newFieldset.appendChild(newExample);
-
-            var form = document.getElementById('form-side');
-            var buttonRef = document.getElementById('add-text-input');
-            form.insertBefore(newFieldset, buttonRef);
-        });
     </script>
 </div>
 {% endblock %}

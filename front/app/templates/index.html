@@ -3,7 +3,8 @@
 {% block content %}
 <div class="container">
     <h1>Secure Meme Generator</h1>
-    <h2>All Templates</h2>
+    <h2>All Templates</h2><br />
+    <a href="{{ url_for('upload') }}">Upload Your Template</a><br />
     <table id="list">
         <thead>
             <tr>
@@ -24,7 +25,6 @@
             {% endfor %}
         </tbody>
     </table>
-    <a href="{{ url_for('upload') }}">Upload Your Template</a>
     <br />
     Adapted from <a href="https://github.com/jacebrowning/memegen">this GitHub project</a>
 </div>
