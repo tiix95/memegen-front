@@ -10,6 +10,7 @@ import sys
 import base64
 from schema import Schema, SchemaError, Optional, And
 import yaml
+from jinja2 import Template
 from functools import lru_cache
 import cachetools
 import magic
@@ -29,18 +30,18 @@ config_schema = Schema({
         "font": str,
         "anchor_x": And(float, lambda x: 0<=x<=1),
         "anchor_y": And(float, lambda x: 0<=x<=1),
-        "angle": float,
+        "angle": And(float, lambda x: -181<=x<=181),
         "scale_x": And(float, lambda x: 0<=x<=1),
         "scale_y": And(float, lambda x: 0<=x<=1),
         "align": str,
         "start": And(float, lambda x: 0<=x<=1),
         "stop": And(float, lambda x: 0<=x<=1)
     }],
-    Optional("example"): [str],
+    "example": [str],
     Optional("overlay"): [{
         "center_x": And(float, lambda x: 0<=x<=1),
         "center_y": And(float, lambda x: 0<=x<=1),
-        "angle": float,
+        "angle": And(float, lambda x: -181<=x<=181),
         "scale": And(float, lambda x: 0<=x<=1)
     }]
 })
@@ -148,8 +149,7 @@ def create(template_name):
 @app.route('/upload', methods=["GET", "POST"])
 def upload():
     if request.method == "GET":
-        with open("/app/default_meme_config.yml", "r") as f:
-            return render_template('upload.html', default_config=f.read())
+        return render_template('upload.html')
     elif request.method == "POST":
         # Validation of tag
         _tag = request.form.get("tag")
@@ -175,10 +175,26 @@ def upload():
             return redirect(url_for('upload'))
         _filename = "default." + _img.filename.rsplit('.')[-1].lower()
         
-        # Validation of config.yml
-        _yml = request.form.get("yml")
-        _yml = "name: " + _name + "\n" + _yml
         try:
+            _text_blocks = []
+            for i in range(len(request.form.getlist('textInputStyle[]'))):
+                d = dict()
+                d["style"] = request.form.getlist('textInputStyle[]')[i]
+                d["color"] = request.form.getlist('textInputColor[]')[i]
+                d["font"] = request.form.getlist('textInputFont[]')[i]
+                d["anchor_x"] = str(float(request.form.getlist('textInputAnchorX[]')[i]))
+                d["anchor_y"] = str(float(request.form.getlist('textInputAnchorY[]')[i]))
+                d["scale_x"] = str(float(request.form.getlist('textInputScaleX[]')[i]))
+                d["scale_y"] = str(float(request.form.getlist('textInputScaleY[]')[i]))
+                d["angle"] = str(float(request.form.getlist('textInputAngle[]')[i]))
+                d["align"] = request.form.getlist('textInputAlignment[]')[i]
+                d["example"] = request.form.getlist('textInputExample[]')[i]
+                _text_blocks.append(d)
+
+            with open("/app/meme_config.yml.j2", "r") as f:
+                tmplt = Template(f.read())
+            _yml = tmplt.render(name=_name, text_blocks=_text_blocks, overlays=[])
+            print(_yml, file=sys.stderr, flush=True)
             configuration = yaml.safe_load(_yml)
             config_schema.validate(configuration)
         except:
@@ -197,10 +213,6 @@ def upload():
     
     return 404
 
-@app.route('/upload_doc', methods=["GET"])
-def doc():
-    return render_template('upload_doc.html')
-
 @app.route('/shorten', methods=["GET"])
 def shorten():
     # Maybe Open Redirect here ? Maybe not ?
@@ -216,7 +228,6 @@ def shorten():
     else:
         print("ccc", file=sys.stderr, flush=True)
         return "Unauthorized", 403
-    print("ddd", file=sys.stderr, flush=True)
 
 @app.route('/meme/<string:tag>', methods=["GET"])
 def short_redirect(tag):

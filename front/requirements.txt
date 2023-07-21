@@ -5,3 +5,4 @@ pyyaml
 schema
 python-magic
 Pillow
+jinja2

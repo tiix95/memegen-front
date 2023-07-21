@@ -38,7 +38,7 @@ services:
     volumes:
       - 'memes_templates:/opt/memegen/templates'
     healthcheck:
-      test: ["CMD-SHELL", "curl --fail http://api:5000/images || exit 1"]
+      test: ["CMD-SHELL", "curl --fail http://api:5000/docs || exit 1"]
       interval: 10s
       timeout: 10s
 

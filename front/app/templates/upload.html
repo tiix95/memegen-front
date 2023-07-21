@@ -10,9 +10,6 @@
         <p>{{ message }}</p>
     </div>
     {% endif %}
-    <p>
-        <a href="{{ url_for('doc') }}">Link to documentation</a><br />
-    </p>
 
     <form method="post" enctype="multipart/form-data" id="upload-form">
         <table id="tableupload">
@@ -34,9 +31,54 @@
                         </label><br /><br />
                     </fieldset>
 
-                    <label for="yml">config.yml
-                        <textarea id="yml" name="yml" required>{{ default_config }}</textarea>
-                    </label><br />
+                    <div id="textInputContainer">
+                        <!-- Initially, we'll have one "Element" category -->
+                        <div class="textInput">
+                            <b>Text Input #<span class="textInputNumber">1</span></b>
+                            <label for="textInputStyle">Style
+                                <select name="textInputStyle[]" required>
+                                    <option value="upper">Upper</option>
+                                    <option value="default">Default</option>
+                                </select>
+                            </label>
+                            <label for="textInputColor">Color
+                                <input type="color" name="textInputColor[]" value="#ffffff">
+                            </label>
+                            <label for="textInputFont">Font
+                                <select name="textInputFont[]" required>
+                                    <option value="thick">Thick</option>
+                                    <option value="thin">Thin</option>
+                                </select>
+                            </label>
+                            <label for="textInputAnchorX">Top-left corner of text-box (horizontal axis) (0 <= x <= 1)
+                                <input type="number" name="textInputAnchorX[]" step="0.01" min="0" max="1" required>
+                            </label>
+                            <label for="textInputAnchorY">Top-left corner of text-box (vertical axis) (0 <= x <= 1)
+                                <input type="number" name="textInputAnchorY[]" step="0.01" min="0" max="1" required>
+                            </label>
+                            <label for="textInputScaleX">Width of text-box (0 < x <= 1)
+                                <input type="number" name="textInputScaleX[]" step="0.01" min="0" max="1" required>
+                            </label>
+                            <label for="textInputAnchorY">Height of text-box (0 < x <= 1)
+                                <input type="number" name="textInputScaleY[]" step="0.01" min="0" max="1" required>
+                            </label>
+                            <label for="textInputAngle">Rotation (-180 <= x <= 180)
+                                <input type="number" name="textInputAngle[]" step="1" min="-181" max="181" required>
+                            </label>
+                            <label for="textInputAlign">Alignment
+                                <select name="textInputAlignment[]" required>
+                                    <option value="center">Center</option>
+                                    <option value="left">Left</option>
+                                    <option value="right">Right</option>
+                                </select>
+                            </label>
+                            <label for="textInputExample">Example text
+                                <input type="text" name="textInputExample[]" required>
+                            </label>
+                        </div>
+                      </div>
+                    </div>
+                    <button type="button" onclick="addTextInput()">Add Text Input</button>
                 </td>
             </tr>
         </table>
@@ -54,6 +96,16 @@
             },
             false
         );
+
+        var elementCount = 1;
+        function addTextInput() {
+            const elementsContainer = document.getElementById("textInputContainer");
+            const elementTemplate = document.querySelector(".textInput");
+
+            const newElement = elementTemplate.cloneNode(true);
+            newElement.querySelector(".textInputNumber").innerText = `${++elementCount}`;
+            elementsContainer.appendChild(newElement);
+        }
     </script>
 </div>
 {% endblock %}

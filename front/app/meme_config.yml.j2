@@ -1,8 +1,7 @@
 name: {{ name }}
 text:
-  {% for t in text_blocks %}
-  - style: {{ t.style }}
-    color: {{ t.color }}
+  {% for t in text_blocks %}- style: {{ t.style }}
+    color: "{{ t.color }}"
     font: {{ t.font }}
     anchor_x: {{ t.anchor_x }}
     anchor_y: {{ t.anchor_y }}
@@ -11,16 +10,15 @@ text:
     scale_y: {{ t.scale_y }}
     align: {{ t.align }}
     start: 0.0
-    stop: 1.0
-  {% endfor %}
+    stop: 1.0{% endfor %}
 example:
-  {% for t in text_blocks %}
-  - {{ t.example }}
-  {% endfor %}
+  {% for t in text_blocks %}- "{{ t.example }}"{% endfor %}
+{% for o in overlays %}
 overlay:
   # overlay a custom image at a specific position
-  - center_x: 0.5
-    center_y: 0.5
-    angle: 0.0
+  - center_x: {{ o.center_x }}
+    center_y: {{ o.center_y }}
+    angle: {{ o.angle }}
     # overlay size in terms of base image size
-    scale: 0.25
+    scale: {{ o.scale }}
+{% endfor %}
