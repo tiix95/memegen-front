@@ -32,7 +32,6 @@
                     </fieldset>
 
                     <div id="textInputContainer">
-                        <!-- Initially, we'll have one "Element" category -->
                         <div class="textInput">
                             <b>Text Input #<span class="textInputNumber">1</span></b>
                             <label for="textInputStyle">Style
@@ -79,6 +78,26 @@
                       </div>
                     </div>
                     <button type="button" onclick="addTextInput()">Add Text Input</button>
+
+                    <div id="overlayContainer">
+                        <div class="overlay">
+                            <b>Overlay #<span class="overlayNumber">1</span></b>
+                            <label for="overlayCenterX">Center X (0 <= x <= 1)
+                                <input type="number" name="overlayCenterX[]" step="0.01" min="0" max="1" required>
+                            </label>
+                            <label for="overlayCenterY">Center Y (0 <= x <= 1)
+                                <input type="number" name="overlayCenterY[]" step="0.01" min="0" max="1" required>
+                            </label>
+                            <label for="overlayScale">Scale (0 < x <= 1)
+                                <input type="number" name="overlayScale[]" step="0.01" min="0" max="1" required>
+                            </label>
+                            <label for="overlayAngle">Angle (-180 <= x <= 180)
+                                <input type="number" name="overlayAngle[]" step="1" min="-181" max="181" required>
+                            </label>
+                        </div>
+                      </div>
+                    </div>
+                    <button type="button" onclick="addOverlay()">Add Overlay</button>
                 </td>
             </tr>
         </table>
@@ -97,14 +116,24 @@
             false
         );
 
-        var elementCount = 1;
+        var textInputCount = 1;
         function addTextInput() {
-            const elementsContainer = document.getElementById("textInputContainer");
-            const elementTemplate = document.querySelector(".textInput");
+            const textInputsContainer = document.getElementById("textInputContainer");
+            const textInputTemplate = document.querySelector(".textInput");
 
-            const newElement = elementTemplate.cloneNode(true);
-            newElement.querySelector(".textInputNumber").innerText = `${++elementCount}`;
-            elementsContainer.appendChild(newElement);
+            const newElement = textInputTemplate.cloneNode(true);
+            newElement.querySelector(".textInputNumber").innerText = `${++textInputCount}`;
+            textInputsContainer.appendChild(newElement);
+        }
+
+        var overlayCount = 1;
+        function addOverlay() {
+            const overlaysContainer = document.getElementById("overlayContainer");
+            const overlayTemplate = document.querySelector(".overlay");
+
+            const newElement = overlayTemplate.cloneNode(true);
+            newElement.querySelector(".overlayNumber").innerText = `${++overlayCount}`;
+            overlaysContainer.appendChild(newElement);
         }
     </script>
 </div>

@@ -81,3 +81,14 @@ textarea {
 #textInputContainer .textInput label {
     margin: 5px;
 }
+
+#overlayContainer .overlay {
+    border: 1px solid #444;
+    padding: 10px;
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+#overlayContainer .overlay label {
+    margin: 5px;
+}

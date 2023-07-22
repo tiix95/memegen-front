@@ -189,11 +189,22 @@ def upload():
                 d["angle"] = str(float(request.form.getlist('textInputAngle[]')[i]))
                 d["align"] = request.form.getlist('textInputAlignment[]')[i]
                 d["example"] = request.form.getlist('textInputExample[]')[i]
-                _text_blocks.append(d)
+                if not d in _text_blocks:
+                    _text_blocks.append(d)
+            
+            _overlays = []
+            for i in range(len(request.form.getlist('overlayCenterX[]'))):
+                d = dict()
+                d["center_x"] = str(float(request.form.getlist('overlayCenterX[]')[i]))
+                d["center_y"] = str(float(request.form.getlist('overlayCenterY[]')[i]))
+                d["scale"] = str(float(request.form.getlist('overlayScale[]')[i]))
+                d["angle"] = str(float(request.form.getlist('overlayAngle[]')[i]))
+                if not d in _overlays:
+                    _overlays.append(d)
 
             with open("/app/meme_config.yml.j2", "r") as f:
                 tmplt = Template(f.read())
-            _yml = tmplt.render(name=_name, text_blocks=_text_blocks, overlays=[])
+            _yml = tmplt.render(name=_name, text_blocks=_text_blocks, overlays=_overlays)
             print(_yml, file=sys.stderr, flush=True)
             configuration = yaml.safe_load(_yml)
             config_schema.validate(configuration)
