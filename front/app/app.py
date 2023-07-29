@@ -16,6 +16,7 @@ import cachetools
 import magic
 import string
 import random
+import time
 from PIL import Image
 
 
@@ -193,14 +194,15 @@ def upload():
                     _text_blocks.append(d)
             
             _overlays = []
-            for i in range(len(request.form.getlist('overlayCenterX[]'))):
-                d = dict()
-                d["center_x"] = str(float(request.form.getlist('overlayCenterX[]')[i]))
-                d["center_y"] = str(float(request.form.getlist('overlayCenterY[]')[i]))
-                d["scale"] = str(float(request.form.getlist('overlayScale[]')[i]))
-                d["angle"] = str(float(request.form.getlist('overlayAngle[]')[i]))
-                if not d in _overlays:
-                    _overlays.append(d)
+            if "boolOverlay" in request.form.keys() and request.form.get("boolOverlay") == "on":
+                for i in range(len(request.form.getlist('overlayCenterX[]'))):
+                    d = dict()
+                    d["center_x"] = str(float(request.form.getlist('overlayCenterX[]')[i]))
+                    d["center_y"] = str(float(request.form.getlist('overlayCenterY[]')[i]))
+                    d["scale"] = str(float(request.form.getlist('overlayScale[]')[i]))
+                    d["angle"] = str(float(request.form.getlist('overlayAngle[]')[i]))
+                    if not d in _overlays:
+                        _overlays.append(d)
 
             with open("/app/meme_config.yml.j2", "r") as f:
                 tmplt = Template(f.read())
@@ -208,7 +210,8 @@ def upload():
             print(_yml, file=sys.stderr, flush=True)
             configuration = yaml.safe_load(_yml)
             config_schema.validate(configuration)
-        except:
+        except Exception as e:
+            print(e, file=sys.stderr, flush=True)
             flash("Yaml not valid, see documentation", category="danger")
             return redirect(url_for('upload'))
 

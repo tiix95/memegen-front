@@ -10,15 +10,16 @@ text:
     scale_y: {{ t.scale_y }}
     align: {{ t.align }}
     start: 0.0
-    stop: 1.0{% endfor %}
+    stop: 1.0
+  {% endfor %}
 example:
-  {% for t in text_blocks %}- "{{ t.example }}"{% endfor %}
-{% for o in overlays %}
+  {% for t in text_blocks %}- "{{ t.example }}"
+  {% endfor %}
 overlay:
   # overlay a custom image at a specific position
-  - center_x: {{ o.center_x }}
+  {% for o in overlays %}- center_x: {{ o.center_x }}
     center_y: {{ o.center_y }}
     angle: {{ o.angle }}
     # overlay size in terms of base image size
     scale: {{ o.scale }}
-{% endfor %}
+  {% endfor %}

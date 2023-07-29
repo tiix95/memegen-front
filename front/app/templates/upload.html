@@ -18,7 +18,11 @@
                     <label for="tag">Template Background <b>(max 4Mo, png/jpg/jpeg)</b><br />
                         <input accept="image/*" type='file' id="imgInp" name="imgInp" required/>
                     </label><br />
-                    <img id="imgPreview" src="#" alt="Image Preview" />
+                    <div class="imgPreviewContainer">
+                        <div class="axes-x" id="xAxis"></div>
+                        <div class="axes-y" id="yAxis"></div>
+                        <img id="imgPreview" src="#" alt="Image Preview" />
+                    </div>
                 </td>
                 <td id="form-side">
                     <fieldset id="meta">
@@ -79,20 +83,25 @@
                     </div>
                     <button type="button" onclick="addTextInput()">Add Text Input</button>
 
-                    <div id="overlayContainer">
+                    
+                    <label for="boolOverlay">Add an overlay ?<br />
+                        <input type="checkbox" id="boolOverlay" name="boolOverlay"></input>
+                    </label><br />
+
+                    <div id="overlayContainer" hidden>
                         <div class="overlay">
                             <b>Overlay #<span class="overlayNumber">1</span></b>
                             <label for="overlayCenterX">Center X (0 <= x <= 1)
-                                <input type="number" name="overlayCenterX[]" step="0.01" min="0" max="1" required>
+                                <input type="number" name="overlayCenterX[]" step="0.01" min="0" max="1">
                             </label>
                             <label for="overlayCenterY">Center Y (0 <= x <= 1)
-                                <input type="number" name="overlayCenterY[]" step="0.01" min="0" max="1" required>
+                                <input type="number" name="overlayCenterY[]" step="0.01" min="0" max="1">
                             </label>
                             <label for="overlayScale">Scale (0 < x <= 1)
-                                <input type="number" name="overlayScale[]" step="0.01" min="0" max="1" required>
+                                <input type="number" name="overlayScale[]" step="0.01" min="0" max="1">
                             </label>
                             <label for="overlayAngle">Angle (-180 <= x <= 180)
-                                <input type="number" name="overlayAngle[]" step="1" min="-181" max="181" required>
+                                <input type="number" name="overlayAngle[]" step="1" min="-181" max="181">
                             </label>
                         </div>
                       </div>
@@ -109,12 +118,69 @@
     <script>
         document.getElementById("imgInp").addEventListener(
             'change',
-            function() { 
+            function() {
+                console.log("Triggered change");
                 const [file] = document.getElementById("imgInp").files;
-                if (file) { document.getElementById("imgPreview").src = URL.createObjectURL(file); }
+                if (file) {
+                    document.getElementById("imgPreview").src = URL.createObjectURL(file);
+                    if (document.getElementById("imgPreview").complete) {
+                        displayGraduatedAxes();
+                    } else {
+                        // If not already loaded, add the "onload" event handler
+                        document.getElementById("imgPreview").onload = displayGraduatedAxes;
+                    }
+                }
             },
             false
         );
+
+        document.getElementById("imgPreview").onload = displayGraduatedAxes;
+
+        /* Preview */
+        function displayGraduatedAxes() {
+            const image = document.getElementById('imgPreview');
+            const xAxis = document.getElementById('xAxis');
+            const yAxis = document.getElementById('yAxis');
+            xAxis.innerHTML = "";
+            yAxis.innerHTML = "";
+
+
+            const aspectRatio = image.naturalWidth / image.naturalHeight;
+            const containerWidth = image.width;
+            const containerHeight = image.height;
+
+            const xAxisTicks = 10; // Adjust the number of ticks on the x-axis as needed
+            const yAxisTicks = 10; // Adjust the number of ticks on the y-axis as needed
+
+            // Calculate the x-axis graduations
+            for (let i = 0; i <= xAxisTicks; i++) {
+                const xPos = (i / xAxisTicks) * containerWidth;
+                const tick = document.createElement('div');
+                tick.classList.add('label-x');
+                tick.style.left = xPos + 'px';
+                tick.textContent = (i/10).toFixed(1);
+                xAxis.appendChild(tick);
+            }
+
+            // Calculate the y-axis graduations
+            for (let i = 0; i <= yAxisTicks; i++) {
+                const yPos = (i / yAxisTicks) * containerHeight;
+                const tick = document.createElement('div');
+                tick.classList.add('label-y');
+                tick.style.top = yPos + 'px';
+                tick.textContent = (i/10).toFixed(1);
+                yAxis.appendChild(tick);
+            }
+        }
+
+        document.getElementById("boolOverlay").addEventListener('change', function () {
+            // If the checkbox is checked, show the hidden element; otherwise, hide it
+            const container = document.getElementById("overlayContainer");
+            container.toggleAttribute('hidden');
+            container.querySelectorAll('input').forEach((input) => {
+                inputtoggleAttribute("required");
+            });
+        });
 
         var textInputCount = 1;
         function addTextInput() {

@@ -39,24 +39,6 @@
     <button id="refreshLink">Get the URL !</button>
     <p id="linkParagraph" hidden>Here is your meme URL : <a href="" id="result">Loading...</a></p>
     <script>
-        const conversions = {
-            '_': '__',
-            '\n': '~n',
-            '-': '--',
-            '_ ': '_-',
-            ' _': '-_',
-            '  ': '_-',
-            ' ': '_',
-            '"': '\'\'',
-            '>': '~g',
-            '<': '~l',
-            '\\': '~b',
-            '/': '~s',
-            '#': '~h',
-            '%': '~p',
-            '&': '~a',
-            '?': '~q'
-        };
         const meme_id = "{{ id }}";
         const meme_ext = "{{ template.extension }}";
         const base_url = location.protocol + '//' + location.host;

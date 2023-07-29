@@ -92,3 +92,48 @@ textarea {
 #overlayContainer .overlay label {
     margin: 5px;
 }
+
+.imgPreviewContainer {
+    position: relative;
+    display: inline-block; /* You can use 'block' if you want it to take the full width */
+}
+  
+.imgPreviewContainer img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+}
+  
+.imgPreviewContainer .axes-x {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+}
+  
+.imgPreviewContainer .axes-x {
+    position: absolute;
+    bottom: -30px;
+    left: 0;
+    width: 100%;
+    height: 30px; /* Adjust the height of the x-axis */
+    /* Add gradient background to the x-axis */
+}
+  
+.imgPreviewContainer .axes-y {
+    position: absolute;
+    bottom: 0;
+    left: -30px;
+    width: 30px; /* Adjust the width of the y-axis */
+    height: 100%;
+    /* Add gradient background to the y-axis */
+}
+
+.imgPreviewContainer .label-x {
+    position: absolute;
+    transform: rotate(-90deg) translate(0%, -50%);
+}
+
+.imgPreviewContainer .label-y {
+    position: absolute;
+    transform: translate(0%, -50%);
+}
