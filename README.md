@@ -2,10 +2,10 @@
 
 ## Some background on the project
 
-Sometimes you just want to meme, but you don't want to send your meme data over the internet. Of course you could use memegen directly, but it is only an API and does not provide a front-end. So I built one, and while I'm at it, I also handled the local deployment for you, with an nginx reverse proxy. So now, with just three commands, **you can meme fully on-premise** :)  
-**ATTENTION** Note that I don't control the memegen repo, and the local memegen instance could as well receive an update that make it return a webpage containing a Google Analytics tag or any other tracker, so please if you put it on premise, block outbound traffic to Google when looking at a meme. It is on my TODO-list to break these tags on the fly with Nginx.  
+Sometimes you just want to meme, but you don't want to send your meme data over the internet. Of course you could deploy the memegen repo directly, but it is only an API and does not provide a front-end interface. So I built one. Now, with just three commands, **you can meme fully on-premise** with a somewhat okay UX :)  
+**ATTENTION** Note that I don't audit the memegen repo, and the local memegen instance could as well receive an update exfiltrating all the data to an external server, so please if you put it on premise, block outbound traffic. The server shouldn't leak any data as it is in a container network marked as "internal", but we're never too cautious. 
 
-To be fair, this is a one-night project. The code could be refactored, the UX is not that great, and there are a thousand things that could be done better. As one would say : it ain't much, but it's honest work.
+To be fair, this is mostly a one-night project. The code could be refactored, the UX is not that great, and there are a thousand things that could be done better. As one would say: it ain't much, but it's honest work. PRs are welcome !
 
 ## Installation
 
