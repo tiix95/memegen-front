@@ -15,7 +15,7 @@ text:
 example:
   {% for t in text_blocks %}- "{{ t.example }}"
   {% endfor %}
-overlay:
+{% if overlays|length > 0 %}overlay:
   # overlay a custom image at a specific position
   {% for o in overlays %}- center_x: {{ o.center_x }}
     center_y: {{ o.center_y }}
@@ -23,3 +23,4 @@ overlay:
     # overlay size in terms of base image size
     scale: {{ o.scale }}
   {% endfor %}
+{% endif %}
