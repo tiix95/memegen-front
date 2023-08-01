@@ -24,6 +24,10 @@ Else, you can use `docker` and `docker compose` (install as usual)
 
 ## Starting the meme generator
 
+First, have a look at the `compose.yml` file. Here you can, among other things, customize the watermark which will be present on your memes via the `MEMEGEN_WATERMARK` environment variable.
+
+Then, you can start the app using `podman`:
+
 ```bash
 podman-compose build
 podman-compose up
