@@ -1,0 +1,3 @@
+[submodule "memegen"]
+	path = memegen
+	url = https://github.com/Antoine-Gicquel/memegen.git
