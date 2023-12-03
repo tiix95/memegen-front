@@ -180,7 +180,9 @@ def upload():
             _text_blocks = []
             for i in range(len(request.form.getlist('textInputStyle[]'))):
                 d = dict()
-                d["style"] = request.form.getlist('textInputStyle[]')[i]
+                d["style"] = request.form.getlist('textInputStyle[]')[i].lower()
+                if d["style"] not in ["default", "mock", "thin", "upper"]:
+                    d["style"] = "default"
                 d["color"] = request.form.getlist('textInputColor[]')[i]
                 d["font"] = request.form.getlist('textInputFont[]')[i]
                 d["anchor_x"] = str(float(request.form.getlist('textInputAnchorX[]')[i]))
@@ -233,14 +235,11 @@ def shorten():
     global url_shortener_dict
     p = request.args.get("path")
     p = base64.urlsafe_b64decode(p + '=' * (-len(p) % 4)).decode('utf-8')
-    print("aaa", file=sys.stderr, flush=True)
     if filter_path_to_shorten(p):
-        print("bbb", file=sys.stderr, flush=True)
         tag = base64.urlsafe_b64encode(md5(p.encode()).digest()).decode().strip('=')
         url_shortener_dict[tag] = p
         return jsonify({'path': p, 'tag': tag})
     else:
-        print("ccc", file=sys.stderr, flush=True)
         return "Unauthorized", 403
 
 @app.route('/meme/<string:tag>', methods=["GET"])
