@@ -1,8 +1,9 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, make_response, send_file
 from dataclasses import dataclass
-from urllib.parse import urlparse
+from urllib.parse import urlparse, quote
 from hashlib import md5
 import requests
+import requests_unixsocket
 import json
 import asyncio
 import os
@@ -51,12 +52,20 @@ config_schema = Schema({
 app = Flask(__name__)
 app.config["MAX_CONTENT_LENGTH"] = 4*1000*1000
 app.secret_key = random.choices(population=string.ascii_letters, k=32)
-MEMEGEN_API = "http://api:5000"
+API_SCHEME = os.getenv("MEMEGEN_API_SCHEME", "http")
+API_HOST = os.getenv("MEMEGEN_API_HOST", "api")
+API_PORT = os.getenv("MEMEGEN_API_PORT", "5000")
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 ALLOWED_MIMETYPES = {'image/png', 'image/jpeg'}
-TEMPLATES_DIR = "/app/memes/templates"
+MEME_CONFIG_J2 = os.getenv("MEMEGEN_J2_CONFIG", "meme_config.yml.j2")
+TEMPLATES_DIR = os.getenv("MEMEGEN_TEMPLATES_DIR", "/app/memes/templates")
 MINI_SIZE_MAX = 200
 
+if API_HOST.startswith('/'):
+    _path = quote(API_HOST, safe='')
+    MEMEGEN_API = f'{API_SCHEME}://{_path}'
+else:
+    MEMEGEN_API = f'{API_SCHEME}://{API_HOST}:{API_PORT}'
 
 @dataclass
 class MemeTemplate:
@@ -100,6 +109,7 @@ def compress(template_name):
 @lru_cache(maxsize=None)
 def get_templates_list():
     _templates_list = dict()
+    requests_unixsocket.monkeypatch()
     r = requests.get(MEMEGEN_API + "/images/")
     l = [x["template"] for x in json.loads(r.text)]
     l = [urlparse(x).path for x in l]
@@ -206,7 +216,7 @@ def upload():
                     if not d in _overlays:
                         _overlays.append(d)
 
-            with open("/app/meme_config.yml.j2", "r") as f:
+            with open(MEME_CONFIG_J2, "r") as f:
                 tmplt = Template(f.read())
             _yml = tmplt.render(name=_name, text_blocks=_text_blocks, overlays=_overlays)
             print(_yml, file=sys.stderr, flush=True)
@@ -217,10 +227,10 @@ def upload():
             flash("Yaml not valid, see documentation", category="danger")
             return redirect(url_for('upload'))
 
-        os.mkdir(f'/app/memes/templates/{_tag}', mode=0o755)
-        with open(f'/app/memes/templates/{_tag}/{_filename}', 'wb+') as f:
+        os.mkdir(TEMPLATES_DIR + f'/{_tag}', mode=0o755)
+        with open(TEMPLATES_DIR + f'/{_tag}/{_filename}', 'wb+') as f:
             f.write(_img_content)
-        with open(f'/app/memes/templates/{_tag}/config.yml', 'w+') as f:
+        with open(TEMPLATES_DIR + f'/{_tag}/config.yml', 'w+') as f:
             f.write(_yml)
 
         get_templates_list.cache_clear()
